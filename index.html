@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tactical 21: Blind Deck</title>
+    <style>
+        /* CSS: Tema Tactical/Military Interface - Lebih Bersih */
+        body {
+            font-family: 'Consolas', 'Monaco', monospace;
+            background-color: #0f172a;
+            /* Slate 900 */
+            color: #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            border-bottom: 2px solid #f59e0b;
+            padding-bottom: 10px;
+            letter-spacing: 2px;
+            color: #f59e0b;
+            text-transform: uppercase;
+        }
+
+        .game-board {
+            width: 100%;
+            max-width: 550px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Area Kartu */
+        .area {
+            background-color: #1e293b;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #334155;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        /* Highlight giliran aktif */
+        .area.active-turn {
+            border-color: #f59e0b;
+            /* Kuning/Emas */
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.2);
+        }
+
+        .label {
+            font-size: 14px;
+            text-transform: uppercase;
+            color: #94a3b8;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+        }
+
+        .hand {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            min-height: 70px;
+            justify-content: center;
+        }
+
+        .card {
+            width: 50px;
+            height: 70px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 26px;
+            box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
+            animation: deal 0.3s ease-out;
+        }
+
+        @keyframes deal {
+            from {
+                transform: scale(0);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .p-card {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+        }
+
+        .e-card {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+
+        .hidden {
+            background: #475569;
+            color: transparent;
+            border: 2px dashed #94a3b8;
+            background-image: linear-gradient(45deg, #475569 25%, #334155 25%, #334155 50%, #475569 50%, #475569 75%, #334155 75%, #334155 100%);
+            background-size: 10px 10px;
+        }
+
+        .hidden::after {
+            content: '?';
+            color: #94a3b8;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        /* Status Bar */
+        #status-bar {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #f59e0b;
+            background: #1e293b;
+            border-radius: 5px;
+            border: 1px solid #334155;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        button {
+            flex: 1;
+            padding: 15px;
+            font-size: 18px;
+            font-family: inherit;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            transition: 0.2s;
+            text-transform: uppercase;
+        }
+
+        .btn-hit {
+            background-color: #3b82f6;
+            color: white;
+            box-shadow: 0 4px 0 #1e40af;
+        }
+
+        .btn-hit:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        .btn-stand {
+            background-color: #f59e0b;
+            color: #0f172a;
+            box-shadow: 0 4px 0 #b45309;
+        }
+
+        .btn-stand:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        .btn-reset {
+            background-color: #e2e8f0;
+            color: #0f172a;
+            display: none;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .log-display {
+            font-size: 13px;
+            color: #64748b;
+            text-align: center;
+            margin-top: 8px;
+            font-style: italic;
+            height: 20px;
+        }
+
+        /* Survival Info */
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            background: #1e293b;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .lives {
+            color: #ef4444;
+            font-size: 20px;
+        }
+
+        .round {
+            color: #f59e0b;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Blind Tactical 21</h1>
+
+    <div class="game-board">
+
+        <div class="game-info">
+            <span class="lives" id="display-lives">❤️❤️❤️</span>
+            <span class="round" id="display-round">RONDE 1</span>
+        </div>
+
+        <div id="status-bar">Menunggu start...</div>
+
+        <div id="area-enemy" class="area">
+            <div class="label">
+                <span>MUSUH (AI)</span>
+                <span id="score-enemy">?</span>
+            </div>
+            <div id="hand-enemy" class="hand"></div>
+            <div id="log-enemy" class="log-display"></div>
+        </div>
+
+        <div id="area-player" class="area">
+            <div class="label">
+                <span>PLAYER (KAMU)</span>
+                <span id="score-player">0</span>
+            </div>
+            <div id="hand-player" class="hand"></div>
+        </div>
+
+        <div class="controls">
+            <button id="btn-hit" class="btn-hit" onclick="actionHit()">HIT (Ambil)</button>
+            <button id="btn-stand" class="btn-stand" onclick="actionStand()">STAND (Oper)</button>
+        </div>
+        <button id="btn-reset" class="btn-reset" onclick="handleNextAction()">LANJUT RONDE</button>
+
+    </div>
+
+    <script>
+        // --- CONFIG ---
+        const BASE_NUMBERS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+
+        // --- STATE ---
+        const MAX_LIVES = 3;
+        let lives = MAX_LIVES;
+        let round = 1;
+
+        let playerDeck = [];
+        let aiDeck = [];
+        let playerHand = [];
+        let aiHand = [];
+
+        let playerLastAction = null;
+        let isPlayerTurn = true;
+        let gameActive = false;
+        let isGameOver = false;
+
+        // --- DOM ELEMENTS ---
+        const elHandP = document.getElementById('hand-player');
+        const elHandE = document.getElementById('hand-enemy');
+        const elScoreP = document.getElementById('score-player');
+        const elScoreE = document.getElementById('score-enemy');
+        const elStatus = document.getElementById('status-bar');
+        const elAreaP = document.getElementById('area-player');
+        const elAreaE = document.getElementById('area-enemy');
+        const elLogE = document.getElementById('log-enemy');
+        const elLives = document.getElementById('display-lives');
+        const elRound = document.getElementById('display-round');
+
+        const btnHit = document.getElementById('btn-hit');
+        const btnStand = document.getElementById('btn-stand');
+        const btnReset = document.getElementById('btn-reset');
+
+        // --- UTILS ---
+        function getSum(hand) { return hand.reduce((a, b) => a + b, 0); }
+
+        function drawCard(deck, hand) {
+            if (deck.length === 0) return null;
+            const idx = Math.floor(Math.random() * deck.length);
+            const val = deck[idx];
+            deck.splice(idx, 1);
+            hand.push(val);
+            return val;
+        }
+
+        // --- GAME LOGIC ---
+
+        function initSurvivalGame() {
+            lives = MAX_LIVES;
+            round = 1;
+            isGameOver = false;
+            startRound();
+        }
+
+        function startRound() {
+            // Reset State Ronde
+            playerDeck = [...BASE_NUMBERS];
+            aiDeck = [...BASE_NUMBERS];
+            playerHand = [];
+            aiHand = [];
+            playerLastAction = null;
+            isPlayerTurn = true;
+            gameActive = true;
+
+            elLogE.innerText = "";
+            btnHit.style.display = "block";
+            btnStand.style.display = "block";
+            btnReset.style.display = "none";
+            document.querySelector('.controls').style.display = 'flex';
+
+            updateSurvivalUI();
+
+            // Deal Awal: 2 Kartu masing-masing
+            drawCard(playerDeck, playerHand);
+            drawCard(playerDeck, playerHand);
+
+            drawCard(aiDeck, aiHand);
+            drawCard(aiDeck, aiHand);
+
+            updateUI(false);
+            setTurn(true);
+        }
+
+        function handleNextAction() {
+            if (isGameOver) {
+                initSurvivalGame();
+            } else {
+                startRound();
+            }
+        }
+
+        function updateSurvivalUI() {
+            let hearts = "";
+            for (let i = 0; i < lives; i++) hearts += "❤️";
+            for (let i = lives; i < MAX_LIVES; i++) hearts += "🖤"; // Hati kosong/hitam
+
+            elLives.innerText = hearts;
+            elRound.innerText = "RONDE " + round;
+        }
+
+        function setTurn(isPlayer) {
+            isPlayerTurn = isPlayer;
+
+            if (isPlayer) {
+                elStatus.innerText = "GILIRAN KAMU";
+                elStatus.style.color = "#3b82f6";
+                elAreaP.classList.add('active-turn');
+                elAreaE.classList.remove('active-turn');
+
+                btnHit.disabled = false;
+                btnStand.disabled = false;
+            } else {
+                elStatus.innerText = "GILIRAN MUSUH...";
+                elStatus.style.color = "#ef4444";
+                elAreaE.classList.add('active-turn');
+                elAreaP.classList.remove('active-turn');
+
+                btnHit.disabled = true;
+                btnStand.disabled = true;
+
+                // Jalankan AI setelah delay
+                setTimeout(aiTurn, 1000);
+            }
+        }
+
+        // --- PLAYER ACTIONS ---
+
+        function actionHit() {
+            if (!gameActive) return;
+
+            drawCard(playerDeck, playerHand);
+            playerLastAction = 'hit';
+
+            updateUI(false);
+            setTurn(false); // Oper ke musuh
+        }
+
+        function actionStand() {
+            if (!gameActive) return;
+
+            playerLastAction = 'stand';
+            elStatus.innerText = "Kamu memilih STAND";
+            setTurn(false); // Oper ke musuh
+        }
+
+        // --- AI LOGIC ---
+
+        function aiTurn() {
+            if (!gameActive) return;
+
+            const aiScore = getSum(aiHand);
+            let aiAction = '';
+            let shouldHit = false;
+
+            // Logika AI Sederhana tapi Agresif
+            if (aiScore < 17) {
+                shouldHit = true;
+            }
+            // Kalau score AI > 21 (Bust), dia cenderung Stand kecuali decknya masih banyak kartu kecil
+            // Tapi untuk amannya kita set dia Stand kalau sudah bust, pasrah.
+            else if (aiScore > 21) {
+                shouldHit = false;
+            }
+
+            if (aiDeck.length === 0) shouldHit = false;
+
+            if (shouldHit) {
+                aiAction = 'hit';
+                drawCard(aiDeck, aiHand);
+                elLogE.innerText = "Musuh mengambil kartu (HIT)...";
+                updateUI(false);
+            } else {
+                aiAction = 'stand';
+                elLogE.innerText = "Musuh memilih STAND.";
+            }
+
+            // CEK END GAME: Jika Player STAND & Musuh STAND berurutan
+            if (playerLastAction === 'stand' && aiAction === 'stand') {
+                endGame();
+            } else {
+                setTurn(true);
+            }
+        }
+
+        // --- RENDER UI ---
+
+        function updateUI(revealAll) {
+            // Player Render
+            elHandP.innerHTML = playerHand.map(c => `<div class="card p-card">${c}</div>`).join('');
+            elScoreP.innerText = getSum(playerHand);
+            // Deck indicator dihapus
+
+            // Enemy Render
+            elHandE.innerHTML = '';
+            const eSum = getSum(aiHand);
+
+            aiHand.forEach((c, idx) => {
+                // Kartu ke-2 musuh selalu hidden sampai game berakhir
+                if (!revealAll && idx === 1) {
+                    elHandE.innerHTML += `<div class="card hidden"></div>`;
+                } else {
+                    elHandE.innerHTML += `<div class="card e-card">${c}</div>`;
+                }
+            });
+
+            if (revealAll) {
+                elScoreE.innerText = eSum;
+            } else {
+                // Jika kartu > 1, sembunyikan total pasti
+                if (aiHand.length >= 2) {
+                    elScoreE.innerText = "?";
+                } else {
+                    elScoreE.innerText = eSum;
+                }
+            }
+        }
+
+        // --- END GAME & SCORING (RULE DOUBLE BUST) ---
+
+        function endGame() {
+            gameActive = false;
+            updateUI(true); // Reveal semua
+
+            const pScore = getSum(playerHand);
+            const aScore = getSum(aiHand);
+
+            let msg = "";
+            let color = "";
+
+            // 1. Double Bust (Keduanya > 21)
+            if (pScore > 21 && aScore > 21) {
+                if (pScore < aScore) {
+                    msg = `DOUBLE BUST! Kamu Menang (Lebih dekat ke 21)!`;
+                    color = "#3b82f6";
+                    round++;
+                } else if (pScore > aScore) {
+                    msg = `DOUBLE BUST! Musuh Menang (Lebih dekat ke 21)!`;
+                    color = "#ef4444";
+                    lives--;
+                } else {
+                    msg = `DOUBLE BUST! SERI!`;
+                    color = "#f59e0b";
+                    // Seri: Tidak ada nyawa berkurang, tidak naik ronde (replay round) atau naik ronde?
+                    // Kita buat naik ronde saja biar progress
+                    round++;
+                }
+            }
+            // 2. Player Aman, Musuh Bust
+            else if (pScore <= 21 && aScore > 21) {
+                msg = "Musuh Bust! KAMU MENANG! 🎉";
+                color = "#3b82f6";
+                round++;
+            }
+            // 3. Player Bust, Musuh Aman
+            else if (pScore > 21 && aScore <= 21) {
+                msg = "Kamu Bust! MUSUH MENANG! 💀";
+                color = "#ef4444";
+                lives--;
+            }
+            // 4. Normal (Keduanya <= 21)
+            else {
+                if (pScore > aScore) {
+                    msg = `KAMU MENANG! (${pScore} vs ${aScore}) 🏆`;
+                    color = "#3b82f6";
+                    round++;
+                } else if (pScore < aScore) {
+                    msg = `MUSUH MENANG! (${pScore} vs ${aScore}) 🤖`;
+                    color = "#ef4444";
+                    lives--;
+                } else {
+                    msg = "SERI (Draw)! 🤝";
+                    color = "#f59e0b";
+                    round++;
+                }
+            }
+
+            updateSurvivalUI();
+
+            // Cek Game Over
+            if (lives <= 0) {
+                isGameOver = true;
+                msg = "GAME OVER! Kamu bertahan sampai Ronde " + round;
+                btnReset.innerText = "COBA LAGI (RESTART)";
+                btnReset.style.backgroundColor = "#ef4444";
+                btnReset.style.color = "white";
+            } else {
+                btnReset.innerText = "LANJUT RONDE BERIKUTNYA";
+                btnReset.style.backgroundColor = "#e2e8f0";
+                btnReset.style.color = "#0f172a";
+            }
+
+            elStatus.innerText = msg;
+            elStatus.style.color = color;
+            document.querySelector('.controls').style.display = 'none';
+            btnReset.style.display = "block";
+        }
+
+        // Start
+        initSurvivalGame();
+
+    </script>
+</body>
+
+</html>
