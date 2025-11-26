@@ -4,14 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tactical 21: Blind Deck</title>
+    <title>Cendol</title>
     <style>
-        /* CSS: Tema Tactical/Military Interface - Lebih Bersih */
+        /* CSS: Tema Monokrom Hitam Putih */
         body {
             font-family: 'Consolas', 'Monaco', monospace;
-            background-color: #0f172a;
-            /* Slate 900 */
-            color: #e2e8f0;
+            background-color: #000000;
+            color: #ffffff;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -21,10 +20,10 @@
         }
 
         h1 {
-            border-bottom: 2px solid #f59e0b;
+            border-bottom: 2px solid #ffffff;
             padding-bottom: 10px;
             letter-spacing: 2px;
-            color: #f59e0b;
+            color: #ffffff;
             text-transform: uppercase;
         }
 
@@ -38,25 +37,24 @@
 
         /* Area Kartu */
         .area {
-            background-color: #1e293b;
+            background-color: #1a1a1a;
             padding: 20px;
             border-radius: 8px;
-            border: 2px solid #334155;
+            border: 2px solid #444444;
             position: relative;
             transition: all 0.3s ease;
         }
 
         /* Highlight giliran aktif */
         .area.active-turn {
-            border-color: #f59e0b;
-            /* Kuning/Emas */
-            box-shadow: 0 0 15px rgba(245, 158, 11, 0.2);
+            border-color: #ffffff;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
         }
 
         .label {
             font-size: 14px;
             text-transform: uppercase;
-            color: #94a3b8;
+            color: #cccccc;
             margin-bottom: 15px;
             display: flex;
             justify-content: space-between;
@@ -97,26 +95,28 @@
         }
 
         .p-card {
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
-            color: white;
+            background: linear-gradient(135deg, #ffffff, #e0e0e0);
+            color: #000000;
+            border: 2px solid #000000;
         }
 
         .e-card {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            color: white;
+            background: linear-gradient(135deg, #333333, #1a1a1a);
+            color: #ffffff;
+            border: 2px solid #666666;
         }
 
         .hidden {
-            background: #475569;
+            background: #2a2a2a;
             color: transparent;
-            border: 2px dashed #94a3b8;
-            background-image: linear-gradient(45deg, #475569 25%, #334155 25%, #334155 50%, #475569 50%, #475569 75%, #334155 75%, #334155 100%);
+            border: 2px dashed #666666;
+            background-image: linear-gradient(45deg, #2a2a2a 25%, #1a1a1a 25%, #1a1a1a 50%, #2a2a2a 50%, #2a2a2a 75%, #1a1a1a 75%, #1a1a1a 100%);
             background-size: 10px 10px;
         }
 
         .hidden::after {
             content: '?';
-            color: #94a3b8;
+            color: #888888;
             font-size: 24px;
             font-weight: bold;
         }
@@ -130,10 +130,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #f59e0b;
-            background: #1e293b;
+            color: #ffffff;
+            background: #1a1a1a;
             border-radius: 5px;
-            border: 1px solid #334155;
+            border: 1px solid #444444;
         }
 
         /* Controls */
@@ -157,9 +157,10 @@
         }
 
         .btn-hit {
-            background-color: #3b82f6;
-            color: white;
-            box-shadow: 0 4px 0 #1e40af;
+            background-color: #ffffff;
+            color: #000000;
+            box-shadow: 0 4px 0 #888888;
+            border: 2px solid #000000;
         }
 
         .btn-hit:active {
@@ -168,9 +169,10 @@
         }
 
         .btn-stand {
-            background-color: #f59e0b;
-            color: #0f172a;
-            box-shadow: 0 4px 0 #b45309;
+            background-color: #333333;
+            color: #ffffff;
+            box-shadow: 0 4px 0 #000000;
+            border: 2px solid #666666;
         }
 
         .btn-stand:active {
@@ -179,11 +181,12 @@
         }
 
         .btn-reset {
-            background-color: #e2e8f0;
-            color: #0f172a;
+            background-color: #ffffff;
+            color: #000000;
             display: none;
             width: 100%;
             margin-top: 10px;
+            border: 2px solid #000000;
         }
 
         button:disabled {
@@ -195,7 +198,7 @@
 
         .log-display {
             font-size: 13px;
-            color: #64748b;
+            color: #888888;
             text-align: center;
             margin-top: 8px;
             font-style: italic;
@@ -206,34 +209,53 @@
         .game-info {
             display: flex;
             justify-content: space-between;
-            background: #1e293b;
+            background: #1a1a1a;
             padding: 10px 20px;
             border-radius: 8px;
-            border: 1px solid #334155;
+            border: 1px solid #444444;
             margin-bottom: 10px;
             font-weight: bold;
         }
 
         .lives {
-            color: #ef4444;
-            font-size: 20px;
+            color: #ffffff;
+            font-size: 18px;
         }
 
         .round {
-            color: #f59e0b;
+            color: #ffffff;
+        }
+
+        .lives-container {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .lives-label {
+            font-size: 11px;
+            color: #cccccc;
+            text-transform: uppercase;
         }
     </style>
 </head>
 
 <body>
 
-    <h1>Blind Tactical 21</h1>
+    <h1>Cendol</h1>
 
     <div class="game-board">
 
         <div class="game-info">
-            <span class="lives" id="display-lives">❤️❤️❤️</span>
+            <div class="lives-container">
+                <span class="lives-label">Player</span>
+                <span class="lives" id="display-lives-player">❤️❤️❤️</span>
+            </div>
             <span class="round" id="display-round">RONDE 1</span>
+            <div class="lives-container">
+                <span class="lives-label">Musuh</span>
+                <span class="lives" id="display-lives-enemy">❤️❤️❤️</span>
+            </div>
         </div>
 
         <div id="status-bar">Menunggu start...</div>
@@ -269,7 +291,8 @@
 
         // --- STATE ---
         const MAX_LIVES = 3;
-        let lives = MAX_LIVES;
+        let playerLives = MAX_LIVES;
+        let enemyLives = MAX_LIVES;
         let round = 1;
 
         let playerDeck = [];
@@ -291,7 +314,8 @@
         const elAreaP = document.getElementById('area-player');
         const elAreaE = document.getElementById('area-enemy');
         const elLogE = document.getElementById('log-enemy');
-        const elLives = document.getElementById('display-lives');
+        const elLivesPlayer = document.getElementById('display-lives-player');
+        const elLivesEnemy = document.getElementById('display-lives-enemy');
         const elRound = document.getElementById('display-round');
 
         const btnHit = document.getElementById('btn-hit');
@@ -313,7 +337,8 @@
         // --- GAME LOGIC ---
 
         function initSurvivalGame() {
-            lives = MAX_LIVES;
+            playerLives = MAX_LIVES;
+            enemyLives = MAX_LIVES;
             round = 1;
             isGameOver = false;
             startRound();
@@ -357,11 +382,18 @@
         }
 
         function updateSurvivalUI() {
-            let hearts = "";
-            for (let i = 0; i < lives; i++) hearts += "❤️";
-            for (let i = lives; i < MAX_LIVES; i++) hearts += "🖤"; // Hati kosong/hitam
+            // Update nyawa player
+            let playerHearts = "";
+            for (let i = 0; i < playerLives; i++) playerHearts += "❤️";
+            for (let i = playerLives; i < MAX_LIVES; i++) playerHearts += "🖤";
+            elLivesPlayer.innerText = playerHearts;
 
-            elLives.innerText = hearts;
+            // Update nyawa musuh
+            let enemyHearts = "";
+            for (let i = 0; i < enemyLives; i++) enemyHearts += "❤️";
+            for (let i = enemyLives; i < MAX_LIVES; i++) enemyHearts += "🖤";
+            elLivesEnemy.innerText = enemyHearts;
+
             elRound.innerText = "RONDE " + round;
         }
 
@@ -370,7 +402,7 @@
 
             if (isPlayer) {
                 elStatus.innerText = "GILIRAN KAMU";
-                elStatus.style.color = "#3b82f6";
+                elStatus.style.color = "#ffffff";
                 elAreaP.classList.add('active-turn');
                 elAreaE.classList.remove('active-turn');
 
@@ -378,7 +410,7 @@
                 btnStand.disabled = false;
             } else {
                 elStatus.innerText = "GILIRAN MUSUH...";
-                elStatus.style.color = "#ef4444";
+                elStatus.style.color = "#cccccc";
                 elAreaE.classList.add('active-turn');
                 elAreaP.classList.remove('active-turn');
 
@@ -498,45 +530,49 @@
             if (pScore > 21 && aScore > 21) {
                 if (pScore < aScore) {
                     msg = `DOUBLE BUST! Kamu Menang (Lebih dekat ke 21)!`;
-                    color = "#3b82f6";
+                    color = "#ffffff";
+                    enemyLives--;
                     round++;
                 } else if (pScore > aScore) {
                     msg = `DOUBLE BUST! Musuh Menang (Lebih dekat ke 21)!`;
-                    color = "#ef4444";
-                    lives--;
+                    color = "#888888";
+                    playerLives--;
+                    round++;
                 } else {
                     msg = `DOUBLE BUST! SERI!`;
-                    color = "#f59e0b";
-                    // Seri: Tidak ada nyawa berkurang, tidak naik ronde (replay round) atau naik ronde?
-                    // Kita buat naik ronde saja biar progress
+                    color = "#cccccc";
                     round++;
                 }
             }
             // 2. Player Aman, Musuh Bust
             else if (pScore <= 21 && aScore > 21) {
                 msg = "Musuh Bust! KAMU MENANG! 🎉";
-                color = "#3b82f6";
+                color = "#ffffff";
+                enemyLives--;
                 round++;
             }
             // 3. Player Bust, Musuh Aman
             else if (pScore > 21 && aScore <= 21) {
                 msg = "Kamu Bust! MUSUH MENANG! 💀";
-                color = "#ef4444";
-                lives--;
+                color = "#888888";
+                playerLives--;
+                round++;
             }
             // 4. Normal (Keduanya <= 21)
             else {
                 if (pScore > aScore) {
                     msg = `KAMU MENANG! (${pScore} vs ${aScore}) 🏆`;
-                    color = "#3b82f6";
+                    color = "#ffffff";
+                    enemyLives--;
                     round++;
                 } else if (pScore < aScore) {
                     msg = `MUSUH MENANG! (${pScore} vs ${aScore}) 🤖`;
-                    color = "#ef4444";
-                    lives--;
+                    color = "#888888";
+                    playerLives--;
+                    round++;
                 } else {
                     msg = "SERI (Draw)! 🤝";
-                    color = "#f59e0b";
+                    color = "#cccccc";
                     round++;
                 }
             }
@@ -544,16 +580,25 @@
             updateSurvivalUI();
 
             // Cek Game Over
-            if (lives <= 0) {
+            if (playerLives <= 0) {
                 isGameOver = true;
-                msg = "GAME OVER! Kamu bertahan sampai Ronde " + round;
+                msg = "GAME OVER! Musuh Menang! Kamu bertahan sampai Ronde " + round;
                 btnReset.innerText = "COBA LAGI (RESTART)";
-                btnReset.style.backgroundColor = "#ef4444";
-                btnReset.style.color = "white";
+                btnReset.style.backgroundColor = "#333333";
+                btnReset.style.color = "#ffffff";
+                btnReset.style.border = "2px solid #666666";
+            } else if (enemyLives <= 0) {
+                isGameOver = true;
+                msg = "KAMU MENANG! Musuh Kalah di Ronde " + round + "! 🏆";
+                btnReset.innerText = "MAIN LAGI (RESTART)";
+                btnReset.style.backgroundColor = "#ffffff";
+                btnReset.style.color = "#000000";
+                btnReset.style.border = "2px solid #000000";
             } else {
                 btnReset.innerText = "LANJUT RONDE BERIKUTNYA";
-                btnReset.style.backgroundColor = "#e2e8f0";
-                btnReset.style.color = "#0f172a";
+                btnReset.style.backgroundColor = "#ffffff";
+                btnReset.style.color = "#000000";
+                btnReset.style.border = "2px solid #000000";
             }
 
             elStatus.innerText = msg;
