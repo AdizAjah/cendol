@@ -1,616 +1,521 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cendol</title>
+    <title>CENDOLE - 21 (Saw Edition)</title>
     <style>
-        /* CSS: Tema Monokrom Hitam Putih */
         body {
-            font-family: 'Consolas', 'Monaco', monospace;
-            background-color: #000000;
-            color: #ffffff;
+            background-color: #050505;
+            color: #dcdcdc;
+            font-family: 'Courier New', Courier, monospace;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            height: 100vh;
             margin: 0;
+            overflow: hidden;
+        }
+        .game-container {
+            width: 800px;
+            max-width: 95%;
+            background-color: #111;
+            border: 1px solid #333;
             padding: 20px;
-        }
-
-        h1 {
-            border-bottom: 2px solid #ffffff;
-            padding-bottom: 10px;
-            letter-spacing: 2px;
-            color: #ffffff;
-            text-transform: uppercase;
-        }
-
-        .game-board {
-            width: 100%;
-            max-width: 550px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        /* Area Kartu */
-        .area {
-            background-color: #1a1a1a;
-            padding: 20px;
-            border-radius: 8px;
-            border: 2px solid #444444;
+            box-shadow: 0 0 30px rgba(0,0,0,0.9);
+            text-align: center;
             position: relative;
-            transition: all 0.3s ease;
+        }
+        /* Efek TV Lama/Scanline */
+        .game-container::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 2;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
         }
 
-        /* Highlight giliran aktif */
-        .area.active-turn {
-            border-color: #ffffff;
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
-        }
-
-        .label {
-            font-size: 14px;
-            text-transform: uppercase;
-            color: #cccccc;
-            margin-bottom: 15px;
+        h1 { color: #cc3333; text-shadow: 0 0 5px #ff0000; margin-bottom: 25px; letter-spacing: 2px; }
+        
+        .info-panel {
             display: flex;
             justify-content: space-between;
-            font-weight: bold;
-        }
-
-        .hand {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            min-height: 70px;
-            justify-content: center;
-        }
-
-        .card {
-            width: 50px;
-            height: 70px;
-            border-radius: 6px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-weight: bold;
-            font-size: 26px;
-            box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
-            animation: deal 0.3s ease-out;
-        }
-
-        @keyframes deal {
-            from {
-                transform: scale(0);
-                opacity: 0;
-            }
-
-            to {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-
-        .p-card {
-            background: linear-gradient(135deg, #ffffff, #e0e0e0);
-            color: #000000;
-            border: 2px solid #000000;
-        }
-
-        .e-card {
-            background: linear-gradient(135deg, #333333, #1a1a1a);
-            color: #ffffff;
-            border: 2px solid #666666;
-        }
-
-        .hidden {
-            background: #2a2a2a;
-            color: transparent;
-            border: 2px dashed #666666;
-            background-image: linear-gradient(45deg, #2a2a2a 25%, #1a1a1a 25%, #1a1a1a 50%, #2a2a2a 50%, #2a2a2a 75%, #1a1a1a 75%, #1a1a1a 100%);
-            background-size: 10px 10px;
-        }
-
-        .hidden::after {
-            content: '?';
-            color: #888888;
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-        /* Status Bar */
-        #status-bar {
-            text-align: center;
-            font-size: 18px;
-            font-weight: bold;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #ffffff;
             background: #1a1a1a;
-            border-radius: 5px;
-            border: 1px solid #444444;
-        }
-
-        /* Controls */
-        .controls {
-            display: flex;
-            gap: 15px;
-            margin-top: 10px;
-        }
-
-        button {
-            flex: 1;
             padding: 15px;
-            font-size: 18px;
-            font-family: inherit;
+            border: 1px solid #333;
+            margin-bottom: 20px;
             font-weight: bold;
-            cursor: pointer;
-            border: none;
-            border-radius: 8px;
-            transition: 0.2s;
-            text-transform: uppercase;
+            box-shadow: inset 0 0 10px #000;
         }
 
-        .btn-hit {
-            background-color: #ffffff;
-            color: #000000;
-            box-shadow: 0 4px 0 #888888;
-            border: 2px solid #000000;
+        .area {
+            min-height: 160px;
+            border: 1px dashed #333;
+            margin: 10px 0;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.02);
+            position: relative;
         }
 
-        .btn-hit:active {
-            transform: translateY(4px);
-            box-shadow: none;
+        /* --- KARTU --- */
+        .card {
+            display: inline-block;
+            width: 60px;
+            height: 90px;
+            background-color: #e0e0e0;
+            color: #111;
+            border-radius: 4px;
+            margin: 5px;
+            line-height: 90px;
+            font-size: 28px;
+            font-weight: bold;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.7);
+            position: relative;
+        }
+        .card.hidden {
+            background-color: #800;
+            color: transparent;
+            background-image: repeating-linear-gradient(45deg, #600 0, #600 10px, #400 10px, #400 20px);
+            border: 1px solid #300;
         }
 
-        .btn-stand {
-            background-color: #333333;
-            color: #ffffff;
-            box-shadow: 0 4px 0 #000000;
-            border: 2px solid #666666;
-        }
-
-        .btn-stand:active {
-            transform: translateY(4px);
-            box-shadow: none;
-        }
-
-        .btn-reset {
-            background-color: #ffffff;
-            color: #000000;
-            display: none;
-            width: 100%;
-            margin-top: 10px;
-            border: 2px solid #000000;
-        }
-
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            box-shadow: none;
-            transform: none;
-        }
-
-        .log-display {
-            font-size: 13px;
-            color: #888888;
-            text-align: center;
-            margin-top: 8px;
-            font-style: italic;
-            height: 20px;
-        }
-
-        /* Survival Info */
-        .game-info {
+        /* --- VISUAL GERGAJI (MODIFIKASI) --- */
+        .saw-container {
             display: flex;
             justify-content: space-between;
-            background: #1a1a1a;
-            padding: 10px 20px;
-            border-radius: 8px;
-            border: 1px solid #444444;
-            margin-bottom: 10px;
-            font-weight: bold;
+            align-items: center;
+            margin: 30px 0;
+            padding: 0 20px;
+            position: relative;
+            z-index: 5;
         }
 
-        .lives {
-            color: #ffffff;
-            font-size: 18px;
+        .track-wrapper {
+            width: 42%;
+            text-align: center;
+            position: relative;
         }
 
-        .round {
-            color: #ffffff;
-        }
-
-        .lives-container {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .lives-label {
-            font-size: 11px;
-            color: #cccccc;
+        .track-label {
+            color: #888; 
+            font-size: 12px; 
+            margin-bottom: 8px; 
             text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .metal-track {
+            height: 12px;
+            background: #000;
+            border-bottom: 1px solid #444;
+            position: relative;
+            box-shadow: inset 0 0 5px #000;
+            /* Membuat tampilan rel bergerigi */
+            background-image: repeating-linear-gradient(90deg, #111, #111 5px, #222 5px, #222 6px);
+        }
+
+        /* Safe Zone sekarang transparan, hanya berfungsi sebagai pengatur jarak */
+        .safe-zone {
+            height: 100%;
+            background: transparent; /* Bar nyawa dihilangkan */
+            width: 100%;
+            transition: width 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+            position: relative;
+            border-right: 2px solid rgba(255, 0, 0, 0.3); /* Sedikit indikator batas */
+        }
+
+        /* Ikon Gergaji */
+        .saw-blade {
+            position: absolute;
+            top: -24px; /* Posisi naik sedikit agar pas di tengah rel */
+            font-size: 45px;
+            filter: drop-shadow(0 0 8px rgba(255, 0, 0, 0.8));
+            animation: spin 0.15s linear infinite;
+            z-index: 10;
+        }
+
+        /* Posisi Gergaji Player (Menempel di ujung kanan safe zone) */
+        #p-saw {
+            right: -22px; 
+        }
+
+        /* Posisi Gergaji Musuh (Menempel di ujung kiri safe zone karena RTL) */
+        #e-saw {
+            left: -22px;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* --- CONTROLS --- */
+        .controls { margin-top: 25px; }
+        button {
+            background: #222;
+            color: #ddd;
+            border: 1px solid #555;
+            padding: 12px 25px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 14px;
+            margin: 0 5px;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        button:hover:not(:disabled) { 
+            background: #cc3333; 
+            border-color: #ff0000; 
+            color: #fff;
+            box-shadow: 0 0 10px #800;
+        }
+        button:disabled { 
+            background: #0a0a0a; 
+            color: #444; 
+            border-color: #333;
+            cursor: not-allowed; 
+        }
+        
+        /* --- TRUMP CARDS --- */
+        .trump-area {
+            margin-top: 20px;
+            border-top: 1px solid #333;
+            padding-top: 15px;
+        }
+        .trump-card {
+            background: #2a2205;
+            border: 1px solid #665c20;
+            color: #d4c355;
+            padding: 8px 12px;
+            margin: 4px;
+            font-size: 11px;
+            cursor: pointer;
+            display: inline-block;
+        }
+        .trump-card:hover:not(:disabled) {
+            background: #4a3b10;
+            border-color: #ffd700;
+            color: #ffd700;
+        }
+        
+        #log {
+            margin-top: 15px;
+            color: #888;
+            font-size: 14px;
+            height: 30px;
+            font-style: italic;
+        }
+
+        /* Shake Effect */
+        .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
         }
     </style>
 </head>
-
 <body>
 
-    <h1>Cendol</h1>
+<div class="game-container">
+    <h1>21: SURVIVAL</h1>
 
-    <div class="game-board">
-
-        <div class="game-info">
-            <div class="lives-container">
-                <span class="lives-label">Player</span>
-                <span class="lives" id="display-lives-player">❤️❤️❤️</span>
-            </div>
-            <span class="round" id="display-round">RONDE 1</span>
-            <div class="lives-container">
-                <span class="lives-label">Musuh</span>
-                <span class="lives" id="display-lives-enemy">❤️❤️❤️</span>
+    <div class="saw-container">
+        <!-- Player Track -->
+        <div class="track-wrapper">
+            <div class="track-label">YOU</div>
+            <div class="metal-track">
+                <!-- Safe zone transparan, hanya mengatur posisi gergaji -->
+                <div class="safe-zone" id="p-safe-zone">
+                    <div class="saw-blade" id="p-saw">⚙️</div>
+                </div>
             </div>
         </div>
 
-        <div id="status-bar">Menunggu start...</div>
+        <div style="font-size: 20px; color: #444; font-weight:bold;">VS</div>
 
-        <div id="area-enemy" class="area">
-            <div class="label">
-                <span>MUSUH (AI)</span>
-                <span id="score-enemy">?</span>
+        <!-- Enemy Track (Direction RTL agar gergaji bergerak dari kanan ke kiri) -->
+        <div class="track-wrapper">
+            <div class="track-label">LUCAS</div>
+            <div class="metal-track" style="direction: rtl;"> 
+                <div class="safe-zone" id="e-safe-zone">
+                    <div class="saw-blade" id="e-saw">⚙️</div>
+                </div>
             </div>
-            <div id="hand-enemy" class="hand"></div>
-            <div id="log-enemy" class="log-display"></div>
         </div>
-
-        <div id="area-player" class="area">
-            <div class="label">
-                <span>PLAYER (KAMU)</span>
-                <span id="score-player">0</span>
-            </div>
-            <div id="hand-player" class="hand"></div>
-        </div>
-
-        <div class="controls">
-            <button id="btn-hit" class="btn-hit" onclick="actionHit()">HIT (Ambil)</button>
-            <button id="btn-stand" class="btn-stand" onclick="actionStand()">STAND (Oper)</button>
-        </div>
-        <button id="btn-reset" class="btn-reset" onclick="handleNextAction()">LANJUT RONDE</button>
-
+    </div>
+    
+    <div class="info-panel">
+        <div>HP: <span id="player-hp">10</span></div>
+        <div>BET: <span id="current-bet" style="color:#ff3333">1</span></div>
+        <div>HP: <span id="enemy-hp">10</span></div>
     </div>
 
-    <script>
-        // --- CONFIG ---
-        const BASE_NUMBERS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+    <div class="area" id="enemy-area">
+        <h3 style="margin-top:0; color:#888;">LUCAS</h3>
+        <div id="enemy-cards"></div>
+        <div id="enemy-score" style="margin-top:10px; color:#aaa;">Score: ???</div>
+    </div>
 
-        // --- STATE ---
-        const MAX_LIVES = 3;
-        let playerLives = MAX_LIVES;
-        let enemyLives = MAX_LIVES;
-        let round = 1;
+    <div class="area" id="player-area">
+        <h3 style="margin-top:0; color:#888;">YOU</h3>
+        <div id="player-cards"></div>
+        <div id="player-score" style="margin-top:10px; color:#aaa;">Score: 0</div>
+    </div>
 
-        let playerDeck = [];
-        let aiDeck = [];
-        let playerHand = [];
-        let aiHand = [];
+    <div id="log">Waiting to start...</div>
 
-        let playerLastAction = null;
-        let isPlayerTurn = true;
-        let gameActive = false;
-        let isGameOver = false;
+    <div class="controls">
+        <button id="btn-hit" onclick="playerHit()">HIT</button>
+        <button id="btn-stay" onclick="playerStay()">STAY</button>
+        <button id="btn-next" onclick="startRound()" style="display:none;">NEXT ROUND</button>
+    </div>
 
-        // --- DOM ELEMENTS ---
-        const elHandP = document.getElementById('hand-player');
-        const elHandE = document.getElementById('hand-enemy');
-        const elScoreP = document.getElementById('score-player');
-        const elScoreE = document.getElementById('score-enemy');
-        const elStatus = document.getElementById('status-bar');
-        const elAreaP = document.getElementById('area-player');
-        const elAreaE = document.getElementById('area-enemy');
-        const elLogE = document.getElementById('log-enemy');
-        const elLivesPlayer = document.getElementById('display-lives-player');
-        const elLivesEnemy = document.getElementById('display-lives-enemy');
-        const elRound = document.getElementById('display-round');
+    <div class="trump-area">
+        <p style="color:#555; font-size:12px; margin-bottom:5px;">TRUMP CARDS</p>
+        <button class="trump-card" id="trump-2up" onclick="useTrump('2up')">TWO-UP (+2 Bet)</button>
+        <button class="trump-card" id="trump-shield" onclick="useTrump('shield')">SHIELD (-1 Bet)</button>
+        <button class="trump-card" id="trump-love" onclick="useTrump('love')">LOVE YOUR ENEMY (Force Hit)</button>
+        <button class="trump-card" id="trump-destroy" style="color: #ff6666; border-color: #a33;" onclick="useTrump('destroy')">DESTROY (Reset)</button>
+        <button class="trump-card" id="trump-exchange" style="color: #66ff66; border-color: #3a3;" onclick="useTrump('exchange')">EXCHANGE (Swap)</button>
+    </div>
+</div>
 
-        const btnHit = document.getElementById('btn-hit');
-        const btnStand = document.getElementById('btn-stand');
-        const btnReset = document.getElementById('btn-reset');
+<script>
+    // --- STATE ---
+    let deck = [];
+    let playerHand = [];
+    let enemyHand = [];
+    let currentBet = 1;
+    let playerHP = 10;
+    let enemyHP = 10;
+    let gameOver = false;
 
-        // --- UTILS ---
-        function getSum(hand) { return hand.reduce((a, b) => a + b, 0); }
+    // --- LOGIC ---
+    function resetDeck() {
+        deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]; 
+        shuffle(deck);
+    }
 
-        function drawCard(deck, hand) {
-            if (deck.length === 0) return null;
-            const idx = Math.floor(Math.random() * deck.length);
-            const val = deck[idx];
-            deck.splice(idx, 1);
-            hand.push(val);
-            return val;
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+
+    function drawCard() {
+        if (deck.length === 0) return null;
+        return deck.pop(); 
+    }
+
+    function startRound() {
+        if (playerHP <= 0 || enemyHP <= 0) {
+            log("Game Over. Refresh to restart.");
+            return;
         }
 
-        // --- GAME LOGIC ---
+        resetDeck();
+        playerHand = [drawCard(), drawCard()];
+        enemyHand = [drawCard(), drawCard()];
+        currentBet = 1; 
+        gameOver = false;
 
-        function initSurvivalGame() {
-            playerLives = MAX_LIVES;
-            enemyLives = MAX_LIVES;
-            round = 1;
-            isGameOver = false;
-            startRound();
-        }
+        // Reset Trumps
+        ['trump-2up', 'trump-shield', 'trump-love', 'trump-destroy', 'trump-exchange'].forEach(id => {
+            document.getElementById(id).disabled = false;
+        });
 
-        function startRound() {
-            // Reset State Ronde
-            playerDeck = [...BASE_NUMBERS];
-            aiDeck = [...BASE_NUMBERS];
-            playerHand = [];
-            aiHand = [];
-            playerLastAction = null;
-            isPlayerTurn = true;
-            gameActive = true;
+        document.getElementById('btn-hit').disabled = false;
+        document.getElementById('btn-stay').disabled = false;
+        document.getElementById('btn-next').style.display = 'none';
+        
+        updateUI();
+        log("Round start. Cards dealt.");
+    }
 
-            elLogE.innerText = "";
-            btnHit.style.display = "block";
-            btnStand.style.display = "block";
-            btnReset.style.display = "none";
-            document.querySelector('.controls').style.display = 'flex';
+    function getScore(hand) {
+        return hand.reduce((a, b) => a + b, 0);
+    }
 
-            updateSurvivalUI();
-
-            // Deal Awal: 2 Kartu masing-masing
-            drawCard(playerDeck, playerHand);
-            drawCard(playerDeck, playerHand);
-
-            drawCard(aiDeck, aiHand);
-            drawCard(aiDeck, aiHand);
-
-            updateUI(false);
-            setTurn(true);
-        }
-
-        function handleNextAction() {
-            if (isGameOver) {
-                initSurvivalGame();
+    function playerHit() {
+        let card = drawCard();
+        if (card) {
+            playerHand.push(card);
+            log(`You drew ${card}.`);
+            if (getScore(playerHand) > 21) {
+                log("YOU BUST!");
+                endRound();
             } else {
-                startRound();
+                updateUI();
             }
         }
+    }
 
-        function updateSurvivalUI() {
-            // Update nyawa player
-            let playerHearts = "";
-            for (let i = 0; i < playerLives; i++) playerHearts += "❤️";
-            for (let i = playerLives; i < MAX_LIVES; i++) playerHearts += "🖤";
-            elLivesPlayer.innerText = playerHearts;
+    function playerStay() {
+        document.getElementById('btn-hit').disabled = true;
+        document.getElementById('btn-stay').disabled = true;
+        log("You Stay. Lucas's turn...");
+        enemyTurn();
+    }
 
-            // Update nyawa musuh
-            let enemyHearts = "";
-            for (let i = 0; i < enemyLives; i++) enemyHearts += "❤️";
-            for (let i = enemyLives; i < MAX_LIVES; i++) enemyHearts += "🖤";
-            elLivesEnemy.innerText = enemyHearts;
+    function enemyTurn() {
+        let currentScore = getScore(enemyHand);
+        let bustChance = calculateBustChance(currentScore);
+        
+        log(`Lucas thinking... (Risk: ${Math.round(bustChance)}%)`);
 
-            elRound.innerText = "RONDE " + round;
-        }
-
-        function setTurn(isPlayer) {
-            isPlayerTurn = isPlayer;
-
-            if (isPlayer) {
-                elStatus.innerText = "GILIRAN KAMU";
-                elStatus.style.color = "#ffffff";
-                elAreaP.classList.add('active-turn');
-                elAreaE.classList.remove('active-turn');
-
-                btnHit.disabled = false;
-                btnStand.disabled = false;
-            } else {
-                elStatus.innerText = "GILIRAN MUSUH...";
-                elStatus.style.color = "#cccccc";
-                elAreaE.classList.add('active-turn');
-                elAreaP.classList.remove('active-turn');
-
-                btnHit.disabled = true;
-                btnStand.disabled = true;
-
-                // Jalankan AI setelah delay
-                setTimeout(aiTurn, 1000);
-            }
-        }
-
-        // --- PLAYER ACTIONS ---
-
-        function actionHit() {
-            if (!gameActive) return;
-
-            drawCard(playerDeck, playerHand);
-            playerLastAction = 'hit';
-
-            updateUI(false);
-            setTurn(false); // Oper ke musuh
-        }
-
-        function actionStand() {
-            if (!gameActive) return;
-
-            playerLastAction = 'stand';
-            elStatus.innerText = "Kamu memilih STAND";
-            setTurn(false); // Oper ke musuh
-        }
-
-        // --- AI LOGIC ---
-
-        function aiTurn() {
-            if (!gameActive) return;
-
-            const aiScore = getSum(aiHand);
-            let aiAction = '';
+        setTimeout(() => {
             let shouldHit = false;
-
-            // Logika AI Sederhana tapi Agresif
-            if (aiScore < 17) {
-                shouldHit = true;
-            }
-            // Kalau score AI > 21 (Bust), dia cenderung Stand kecuali decknya masih banyak kartu kecil
-            // Tapi untuk amannya kita set dia Stand kalau sudah bust, pasrah.
-            else if (aiScore > 21) {
-                shouldHit = false;
-            }
-
-            if (aiDeck.length === 0) shouldHit = false;
+            let playerScore = getScore(playerHand);
+            
+            // Logika AI Sederhana tapi Efektif
+            if (currentScore === 21) shouldHit = false;
+            else if (bustChance < 30) shouldHit = true;
+            else if (currentScore < playerScore && playerScore <= 21) shouldHit = true; // Desperate
+            else shouldHit = false;
 
             if (shouldHit) {
-                aiAction = 'hit';
-                drawCard(aiDeck, aiHand);
-                elLogE.innerText = "Musuh mengambil kartu (HIT)...";
-                updateUI(false);
+                let card = drawCard();
+                if (card) {
+                    enemyHand.push(card);
+                    log(`Lucas hits and gets ${card}.`);
+                    updateUI(); // Update UI segera setelah ambil kartu
+                    
+                    if (getScore(enemyHand) > 21) {
+                        endRound();
+                    } else {
+                        enemyTurn(); // Mikir lagi
+                    }
+                } else {
+                    endRound();
+                }
             } else {
-                aiAction = 'stand';
-                elLogE.innerText = "Musuh memilih STAND.";
+                log("Lucas Stays.");
+                endRound();
             }
+        }, 1200);
+    }
 
-            // CEK END GAME: Jika Player STAND & Musuh STAND berurutan
-            if (playerLastAction === 'stand' && aiAction === 'stand') {
-                endGame();
-            } else {
-                setTurn(true);
-            }
+    function calculateBustChance(currentScore) {
+        let bustCount = 0;
+        let total = deck.length;
+        if (total === 0) return 100;
+        deck.forEach(card => {
+            if (currentScore + card > 21) bustCount++;
+        });
+        return (bustCount / total) * 100;
+    }
+
+    function useTrump(type) {
+        if (gameOver) return;
+        
+        if (type === '2up') currentBet += 2;
+        else if (type === 'shield') currentBet = Math.max(0, currentBet - 1);
+        else if (type === 'love') {
+            let card = drawCard();
+            if (card) enemyHand.push(card);
+        }
+        else if (type === 'destroy') currentBet = 1;
+        else if (type === 'exchange') [playerHand, enemyHand] = [enemyHand, playerHand];
+
+        document.getElementById('trump-' + type).disabled = true;
+        updateUI();
+        log(`Trump activated: ${type.toUpperCase()}`);
+    }
+
+    function endRound() {
+        gameOver = true;
+        document.getElementById('btn-hit').disabled = true;
+        document.getElementById('btn-stay').disabled = true;
+        document.getElementById('btn-next').style.display = 'inline-block';
+
+        updateUI(); // Reveal cards
+
+        let pScore = getScore(playerHand);
+        let eScore = getScore(enemyHand);
+        let winner = "draw";
+
+        if (pScore > 21 && eScore > 21) winner = pScore < eScore ? "player" : "enemy";
+        else if (pScore > 21) winner = "enemy";
+        else if (eScore > 21) winner = "player";
+        else if (pScore > eScore) winner = "player";
+        else if (eScore > pScore) winner = "enemy";
+
+        if (winner === "player") {
+            enemyHP -= currentBet;
+            log(`YOU WIN! Lucas takes ${currentBet} damage.`);
+        } else if (winner === "enemy") {
+            playerHP -= currentBet;
+            log(`YOU LOSE! You take ${currentBet} damage.`);
+            document.querySelector('.game-container').classList.add('shake');
+            setTimeout(() => document.querySelector('.game-container').classList.remove('shake'), 500);
+        } else {
+            log("DRAW.");
         }
 
-        // --- RENDER UI ---
+        updateUI(); // Update Visual HP position
 
-        function updateUI(revealAll) {
-            // Player Render
-            elHandP.innerHTML = playerHand.map(c => `<div class="card p-card">${c}</div>`).join('');
-            elScoreP.innerText = getSum(playerHand);
-            // Deck indicator dihapus
+        if (playerHP <= 0) setTimeout(() => alert("YOU DIED"), 500);
+        if (enemyHP <= 0) setTimeout(() => alert("LUCAS DEFEATED"), 500);
+    }
 
-            // Enemy Render
-            elHandE.innerHTML = '';
-            const eSum = getSum(aiHand);
+    function log(msg) {
+        document.getElementById('log').innerText = msg;
+    }
 
-            aiHand.forEach((c, idx) => {
-                // Kartu ke-2 musuh selalu hidden sampai game berakhir
-                if (!revealAll && idx === 1) {
-                    elHandE.innerHTML += `<div class="card hidden"></div>`;
-                } else {
-                    elHandE.innerHTML += `<div class="card e-card">${c}</div>`;
-                }
-            });
-
-            if (revealAll) {
-                elScoreE.innerText = eSum;
+    function renderCards(elementId, cards, hideFirst = false) {
+        const container = document.getElementById(elementId);
+        container.innerHTML = '';
+        cards.forEach((card, index) => {
+            let div = document.createElement('div');
+            div.className = 'card';
+            if (hideFirst && index === 0) {
+                div.classList.add('hidden');
+                div.innerText = "?";
             } else {
-                // Jika kartu > 1, sembunyikan total pasti
-                if (aiHand.length >= 2) {
-                    elScoreE.innerText = "?";
-                } else {
-                    elScoreE.innerText = eSum;
-                }
+                div.innerText = card;
             }
+            container.appendChild(div);
+        });
+    }
+
+    function updateUI() {
+        document.getElementById('current-bet').innerText = currentBet;
+        document.getElementById('player-hp').innerText = Math.max(0, playerHP);
+        document.getElementById('enemy-hp').innerText = Math.max(0, enemyHP);
+
+        renderCards('player-cards', playerHand);
+        document.getElementById('player-score').innerText = "Score: " + getScore(playerHand);
+
+        if (!gameOver) {
+            renderCards('enemy-cards', enemyHand, true);
+            let visibleScore = enemyHand.length > 1 ? getScore(enemyHand.slice(1)) : 0;
+            document.getElementById('enemy-score').innerText = "Score: ? + " + visibleScore;
+        } else {
+            renderCards('enemy-cards', enemyHand, false);
+            document.getElementById('enemy-score').innerText = "Score: " + getScore(enemyHand);
         }
 
-        // --- END GAME & SCORING (RULE DOUBLE BUST) ---
+        // UPDATE POSISI GERGAJI (Visual HP)
+        let pPercent = Math.max(0, (playerHP / 10) * 100);
+        let ePercent = Math.max(0, (enemyHP / 10) * 100);
+        
+        document.getElementById('p-safe-zone').style.width = pPercent + "%";
+        document.getElementById('e-safe-zone').style.width = ePercent + "%";
+    }
 
-        function endGame() {
-            gameActive = false;
-            updateUI(true); // Reveal semua
+    // Start
+    startRound();
+</script>
 
-            const pScore = getSum(playerHand);
-            const aScore = getSum(aiHand);
-
-            let msg = "";
-            let color = "";
-
-            // 1. Double Bust (Keduanya > 21)
-            if (pScore > 21 && aScore > 21) {
-                if (pScore < aScore) {
-                    msg = `DOUBLE BUST! Kamu Menang (Lebih dekat ke 21)!`;
-                    color = "#ffffff";
-                    enemyLives--;
-                    round++;
-                } else if (pScore > aScore) {
-                    msg = `DOUBLE BUST! Musuh Menang (Lebih dekat ke 21)!`;
-                    color = "#888888";
-                    playerLives--;
-                    round++;
-                } else {
-                    msg = `DOUBLE BUST! SERI!`;
-                    color = "#cccccc";
-                    round++;
-                }
-            }
-            // 2. Player Aman, Musuh Bust
-            else if (pScore <= 21 && aScore > 21) {
-                msg = "Musuh Bust! KAMU MENANG! 🎉";
-                color = "#ffffff";
-                enemyLives--;
-                round++;
-            }
-            // 3. Player Bust, Musuh Aman
-            else if (pScore > 21 && aScore <= 21) {
-                msg = "Kamu Bust! MUSUH MENANG! 💀";
-                color = "#888888";
-                playerLives--;
-                round++;
-            }
-            // 4. Normal (Keduanya <= 21)
-            else {
-                if (pScore > aScore) {
-                    msg = `KAMU MENANG! (${pScore} vs ${aScore}) 🏆`;
-                    color = "#ffffff";
-                    enemyLives--;
-                    round++;
-                } else if (pScore < aScore) {
-                    msg = `MUSUH MENANG! (${pScore} vs ${aScore}) 🤖`;
-                    color = "#888888";
-                    playerLives--;
-                    round++;
-                } else {
-                    msg = "SERI (Draw)! 🤝";
-                    color = "#cccccc";
-                    round++;
-                }
-            }
-
-            updateSurvivalUI();
-
-            // Cek Game Over
-            if (playerLives <= 0) {
-                isGameOver = true;
-                msg = "GAME OVER! Musuh Menang! Kamu bertahan sampai Ronde " + round;
-                btnReset.innerText = "COBA LAGI (RESTART)";
-                btnReset.style.backgroundColor = "#333333";
-                btnReset.style.color = "#ffffff";
-                btnReset.style.border = "2px solid #666666";
-            } else if (enemyLives <= 0) {
-                isGameOver = true;
-                msg = "KAMU MENANG! Musuh Kalah di Ronde " + round + "! 🏆";
-                btnReset.innerText = "MAIN LAGI (RESTART)";
-                btnReset.style.backgroundColor = "#ffffff";
-                btnReset.style.color = "#000000";
-                btnReset.style.border = "2px solid #000000";
-            } else {
-                btnReset.innerText = "LANJUT RONDE BERIKUTNYA";
-                btnReset.style.backgroundColor = "#ffffff";
-                btnReset.style.color = "#000000";
-                btnReset.style.border = "2px solid #000000";
-            }
-
-            elStatus.innerText = msg;
-            elStatus.style.color = color;
-            document.querySelector('.controls').style.display = 'none';
-            btnReset.style.display = "block";
-        }
-
-        // Start
-        initSurvivalGame();
-
-    </script>
 </body>
-
 </html>
